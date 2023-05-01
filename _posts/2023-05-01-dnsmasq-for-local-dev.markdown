@@ -9,48 +9,43 @@ tags: [dns, domains]
   sudo brew services restart dnsmasq
   bash -c 'echo "nameserver 127.0.0.1" > /etc/resolver/test'
 ```
+----
+Following the [last tip](/2023/dnsmasq-for-local-dev/), i mentioned 3 main ways to point fake domains towards 127.0.0.1:
 
-Following the last tip, i mentioned 3 main ways to point fake domains towards 127.0.0.1:
-
-#### Service like lvh.me
-
-**Pros**
-- Nothing to Configure it just ready to use
-- As many subdomains as you want
-- Tools like dig or ping will behave properly
-
-**Cons**
+##### SERVICES LIKE LVH.ME
+```diff
++ Nothing to Configure it just ready to use
++ Tools like dig or ping will behave properly
++ As many subdomains as you want
 - Requires internet
-- You can only works with subdomains, or wirh lvh.me domain
+- You can only works with subdomains, but only lvh.me domain
+```
+##### HOSTS FILES
+```diff
++ No internet needed
++ Is easy to use
++ 3rd party app make it easier
+- I need to configure each domain, subdomain
+- Dig or ping will not behave properly
+```
 
-#### Typical Hosts file (using iHosts or not)
+##### DNSMAQ
+```diff
++ Can configure a (any fake or not) tld
++ domains/subdomains under the tld will work
++ Dig or ping will behave properly
++ Configuration once done no need to do it again
+- More complex configuration
+```
 
-**Pros**
-- No internet needed
-- Is easy to use
-- 3rd party app make it easier
+----
 
-**Cons**
-- I need to configure each domain, subdomain that im going to make reference
-- tools like dig or ping will not behave properly
+## How to use DNSMasq
 
-#### Dnsmaq
-
-**Pros**
-- Can configure a (any) tld and all domains subdomains under the tld will work
-- Can configure it to work as a normal dns system tools like dig or ping will behave properly
-- Configuration once done no need to do it again
-
-**Cons**
-- Little bit more complex configuration
-
-
-## DNSMasq
-
-### Requirements
+#### Installation
 - Install DNSMasq: `brew install dnsmasq`
 
-### Configuration of `.test` ltd
+#### Configuration
 
 
 ```shell
@@ -58,14 +53,18 @@ Following the last tip, i mentioned 3 main ways to point fake domains towards 12
   $ sudo brew services restart dnsmasq
 ```
 
-With this we have already our dns system working for `.test` tld we can check it doing
+With this we have already our dnsmasq system working for `.test` tld we can check it doing
 
 ```shell
   $ dig +short somefakedomain.test @127.0.0.1
   127.0.0.1
 ```
 
-Now we need to tell the computer to look for the `.test` tld in that dns server. We could only go and add `127.0.0.1` to our dns resolvers but then that will affect to all the request we do. To make it work only for the `.test` domains we should do this:
+Now we need make our dns resolution to look for the `.test` tld in our dnsmasq. This could be done in 2 ways:
+1. Add `127.0.0.1` to our dns resolvers `(/etc/resolv.conf)`. But then that will affect to the resolution of all domains not only the `.test`.
+2. Or make the dns resolver aware that `.test` domains has to be resolved with dnsmasq at `127.0.0.1`
+
+We are going to do the **second** one:
 
 ```shell
   sudo mkdir -v /etc/resolver
