@@ -1,12 +1,14 @@
 ---
-title:  "https proxy in 2 steps"
+title:  "https proxy in 1 step"
 date:   2023-04-30 20:50:00
 categories: [development, tool]
 tags: [caddy, dns, domains]
 ---
  ```shell
- caddy reverse-proxy -from anysubdomain.lvh.me -to :3000 -internal-certs
+  caddy reverse-proxy --from anysubdomain.lvh.me --to :3000 --internal-certs
 ```
+Note: this article was updated to work with the last version 2.6.4 at the time of this fix.
+
 When doing local development, testing https, subdomains, custom domains, is a real pain in the ass. This is because means: generating certs, configuring different cases, webserver....
 
 A simple way to do this and also works properly in the browser is using [caddy](https://caddyserver.com/).
@@ -25,30 +27,20 @@ To make a domain point to localhost we can use
 - dnsmasq (next blog entry will be about this)
 - or you can use any service like [lvh.me](lvh.me) any subdomain will point towards 127.0.0.1
 
-### For this you only need 2 steps
+### For this you only need ~~2 steps~~
 
-#### First step
-
-```shell
-  caddy reverse-proxy -from anysubdomain.lvh.me -to :3000 -internal-certs
-```
-
-After this going to https://anysubdomain.lvh.me our response will be
-![image](https://user-images.githubusercontent.com/230512/235200147-3692e0b9-263d-42f1-9cd0-94997c116599.png)
-
-Time for:
-
-#### Second step:
-
-> This step is only needed once. Unless you dont remove the trusted CA Cert you will not have to do it again anymore.
-
-Trusting the CA Cert:
+#### ~~Second~~ Only step
 
 ```shell
-  sudo caddy trust
+  caddy reverse-proxy --from anysubdomain.lvh.me --to :3000 --internal-certs
 ```
+First time will ask the pawssword to trust the cert.
 
-After this reload the browser and will be done!!!
+After this go to your fake domain `anysubdomain.lvh.me` and will be done!!
+
+## Video
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ff1JDa41tpc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ---
 
@@ -57,7 +49,7 @@ After this reload the browser and will be done!!!
 If you want to use it as service you can use the Caddyfile with your normal service manager. But if you only download the binary you can do
 
 ```shell
-  caddy start -config Caddyfile
+  caddy start --config Caddyfile
 ```
 
 ```config
@@ -72,3 +64,25 @@ https:// {
 
 
 This will load caddy in bg and can be stopped with caddy stop.
+
+----
+
+# The 2 Step version is still valid
+
+#### First step:
+
+> This step is only needed once. Unless you dont remove the trusted CA Cert you will not have to do it again anymore.
+
+Trusting the CA Cert:
+
+```shell
+  sudo bash -c "caddy start && caddy trust && caddy stop"
+```
+
+#### Second step
+
+```shell
+  caddy reverse-proxy --from anysubdomain.lvh.me --to :3000 --internal-certs
+```
+
+After this go to your fake domain `anysubdomain.lvh.me` and will be done!!

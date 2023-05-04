@@ -3,7 +3,7 @@ title: "argami's site"
 description: 'Time to time tips and tricks'
 url: 'http://argami.github.io/'
 baseurl: ''
-# google_analytics: 'UA-XXXXXX-X'
+google_analytics: 'ee2f1c0d-2d26-443c-8617-65db027dd7ef'
 # disqus_shortname: 'your-disqus-name'
 # disable_landing_page: true
 
